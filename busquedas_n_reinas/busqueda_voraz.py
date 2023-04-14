@@ -1,132 +1,96 @@
-from mimetypes import init
+import time
+import sys
+import random
+from tableroreinas import ChessboardGUI
+sys.setrecursionlimit(10000)
 
-class VectorConAtaque:
-    def __init__ (self, V):
-        self.Vector = V
-        self.Ataques = None
-    def AsignarAtaque(self,A):
-        self.Ataques = A 
-    def getVector(self):
-        return self.Vector
+def CalcularAtaques(lista):
+    length = len(lista)
+    Ataques = 0
+    for i in range(length - 1):
+        for j in range(i + 1, length):
+            if (lista[i] == lista[j]):
+                Ataques += 2
+            elif ((abs(i - j) - abs(lista[i] - lista[j])) == 0):
+                Ataques += 2
+    return Ataques
+
+
+def GoalTest(lista):
+    Numero_Ataques = CalcularAtaques(lista)
+    if (Numero_Ataques == 0):
+        return True
+    else:
+        return False
+
+
+lista_negra = []
+
 
 def Expand(V):
-
     copia = V.copy()
     arregloBi = []
-    for j in range(len(V)):
-        for x in range(len(V)):
-            var = V[x]+(j)
-            print(var)
-            if(var > len(V)): 
-                V[x] = var-V[x]
-                arregloBi.append(V.copy())
+    reina_n = len(V)
+    lista_negra.append(V)
+    for j in range(0, reina_n):
+        for x in range(0, reina_n):
+            var = V[x] + j
+            if var >= reina_n:
+                V[x] = var - reina_n
+                #print(V)
+                V not in lista_negra and arregloBi.append(V.copy())
                 V = copia.copy()
-                print(arregloBi)
                 continue
             V[x] = var
-            arregloBi.append(V.copy())
+            V not in lista_negra and arregloBi.append(V.copy())
             V = copia.copy()
-            print(arregloBi)
+    return arregloBi
 
-    return arregloBi    
 
-def MandarError():
-    print("No se encontro el elemento")
-    exit()
-def Ataques(V):
-    atq = 0
-    for i in range(len(V)):
-        for j in range(i+1,len(V)):
-            if(V[i] == V[j]):
-                atq += 2
-            elif abs(i-j) == abs(V[i]-V[j]):
-                atq += 2
-    return atq
+def Evaluar(offSpring):
+    lista = []
+    for i in offSpring:
+        Naataques = CalcularAtaques(i)
+        lista.append([i, Naataques])
+    return lista
 
-def LimitarB(E_A):  
-    return 1 not in E_A
-
-def Goaltest(V):
-    return Ataques(V) == 0
-
-def B_G(F):
-
-    if(len(F) != 0):
-
-        E_A = F.pop(0)
-        print("ElementoSeleccionado",E_A.getVector(), E_A.Ataques)
-
-        if(Goaltest(E_A.getVector())): 
-            end_time = datetime.now()
-            print('Duration: {}'.format(end_time - start_time))
-            
-            muestraResultado(E_A.getVector())
-            TerminarPrograma()      
-        else:
-            OS = Expand(E_A.getVector())
-            OS = Evaluo(OS)
-            F = F+OS
-            F.sort(key  = lambda x: x.Ataques, reverse = False)
-            if(len(F) == 0):
-                return
-            F = [TomaPrimerElemento(F)]
-            B_G(F)
 
 def TomaPrimerElemento(F):
     repetidos = 0
-    menor = F[0].Ataques   
-    for x in range(len(F)-1):
-        if(menor == F[x+1].Ataques):
-            repetidos = repetidos+1
-    numero = random.randint(0,repetidos)
-    return F[numero]
-    
+    menor = F[0][1]
+    for x in range(len(F) - 1):
+        if (menor == F[x + 1][1]):
+            repetidos = repetidos + 1
+        else:
+            break
+    return F[random.randint(0, repetidos)][0]
 
-        
-def Evaluo(OS):
-    OSNuevo = []
-    contador = 0
-    for x in range(len(OS)):
-        if(LimitarB(OS[x])):
-            continue
-        OSNuevo.append(VectorConAtaque(OS[x]))
-        OSNuevo[contador].AsignarAtaque(Ataques(OS[x]))
-        contador = contador+1
 
-    return OSNuevo
+def voraz(F):
+    if not F:
+        return
+    Edo_act = F.pop(0)
+    print("ESTADO ACTUAL")
+    print(Edo_act)
+    if (GoalTest(Edo_act)):
+        print(Edo_act, " es solucion")
+        print("--- %s seconds ---" % (time.time() - start_time))
+        gui = ChessboardGUI(len(Edo_act), Edo_act)
+        return
+    else:
+        offSpring = Expand(Edo_act)
+        print(offSpring)
+        offSpring = Evaluar(offSpring)
 
-def TerminarPrograma():
-    exit()
+        offSpring.sort(key=lambda x: x[1])
+        F = [TomaPrimerElemento(offSpring)]
+        voraz(F)
 
-def muestraResultado(E_a):
-    print("Elemento encontrado")
-    board = np.zeros((len(E_a),len(E_a),3))
-    board += 0.5 # "Black" color. Can also be a sequence of r,g,b with values 0-1.
-    board[::2, ::2] = 1 # "White" color
-    board[1::2, 1::2] = 1 # "White" color
-    for x in range(len(E_a)):
-        E_a[x] = E_a[x]-1        
-    positions = E_a
-    print(E_a)
 
-    fig, ax = plt.subplots(nrows=1, num="Tablero Reinas")
-    ax.imshow(board, interpolation='nearest')
-    for y, x in enumerate(positions):
-        ax.text(x, y, u'\u2655', size=18, ha='center', va='center')
-    ax.set(xticks=[], yticks=[])
-    ax.axis('image')
-    plt.show()
+F = [[]]
+for k in range(50):
+    F[0].append(0)
 
-import matplotlib.pyplot as plt
-import numpy as np
-import math
-import random 
-from datetime import datetime
-import sys
-#from CodOptimizado.Utilerias import *
-sys.setrecursionlimit(233232323)
-start_time = datetime.now()                                                                                           
-E_i = VectorConAtaque([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,00,0,0,0,0,0,0,0,0,0])
-F = [E_i]
-B_G(F)
+start_time = time.time()
+voraz(F)
 
