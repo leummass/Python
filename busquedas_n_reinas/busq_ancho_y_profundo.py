@@ -1,9 +1,8 @@
 import sys
 import time
 
+from busquedas_n_reinas.tableroreinas import ChessboardGUI
 sys.setrecursionlimit(10000000)
-visitados = []
-
 
 def CalcularAtaques(lista):
     length = len(lista)
@@ -16,75 +15,49 @@ def CalcularAtaques(lista):
                 Ataques += 2
     return Ataques
 
-
 def GoalTest(lista):
-    if (CalcularAtaques(lista) == 0):
-        return True
-    else:
-        return False
-
+    return CalcularAtaques(lista) == 0
 
 def B_Ancho(Frontera):
-    if (len(Frontera) == 0):
+    if not Frontera:
         return
-    Edo_Actual = Frontera[0]
-    Frontera.pop(0)
-    print(Edo_Actual)
-    if (GoalTest(Edo_Actual)):
-        Edo_Actual.reverse()
-        print("Estado actual ", Edo_Actual)
-        print("SOLUCION ENCONTRADA")
+    EA = Frontera.pop(0)
+    print(EA)
+    if GoalTest(EA):
+        EA.reverse()
+        print(EA, " es solución")
+        print("--- %s seconds ---" % (time.time() - start_time))
+        gui = ChessboardGUI(len(EA), EA)
         return
     else:
-        V = Expand(Edo_Actual)
-        Frontera += V
-    ##        print("Frontera",Frontera)
+        OS = Expand(EA)
+        Frontera += OS
     B_Ancho(Frontera)
 
 def B_Profundo(Frontera):
-    if (len(Frontera) == 0):
+    if not Frontera:
         return
-    Edo_Actual = Frontera[0]
-    Frontera.pop(0)
-
-    if (GoalTest(Edo_Actual)):
-        Edo_Actual.reverse()
-        print("Estado actual ", Edo_Actual)
-        print("SOLUCION ENCONTRADA")
-        return
-    else:
-        V = Expand(Edo_Actual)
-        V+=Frontera
-    ##        print("Frontera",Frontera)
-    B_Profundo(V)
-
-def B_Voraz(Frontera):
-    if (len(Frontera) == 0):
-        return
-    Edo_Actual = Frontera[0]
-    Frontera.pop(0)
-
-    if (GoalTest(Edo_Actual)):
-        Edo_Actual.reverse()
-        print("Estado actual ", Edo_Actual)
-        print("SOLUCION ENCONTRADA")
+    EA = Frontera.pop(0)
+    print(EA)
+    if GoalTest(EA):
+        EA.reverse()
+        print(EA, " es solución")
+        print("--- %s seconds ---" % (time.time() - start_time))
+        gui = ChessboardGUI(len(EA), EA)
         return
     else:
-        V = Expand(Edo_Actual)
-        V= Evaluate(V)
-        V+=Frontera
-    ##  print("Frontera",Frontera)
-    B_Voraz(V)
+        OS = Expand(EA)
+        OS+=Frontera
+        print("Frontera",Frontera)
+    B_Profundo(OS)
 
-
-def Expand(Edo_Actual):
+def Expand(EA):
     V = []
-
-    visitados.append(Edo_Actual)
-    for i in range(len(Edo_Actual)):
-        listAux = list(Edo_Actual)
+    visitados.append(EA)
+    for i in range(len(EA)):
+        listAux = list(EA)
         posicion = listAux[i]
-        if (posicion < len(Edo_Actual)):
+        if (posicion < len(EA)-1):
             posicion += 1
             listAux[i] = posicion
             V.append(listAux)
@@ -101,19 +74,14 @@ def Evaluate(V):
         if CalcularAtaques(V[i]) == listAux[0]:
             V3=V[i]
             V2.append(V3)
-
             return V2
 
-
-
-
-Frontera = [[1, 1, 1, 1]]
-print(Frontera)
+Frontera = [[0, 0, 0, 0]]
+visitados =[]
 start_time = time.time()
-#B_Ancho(Frontera)
+B_Ancho(Frontera)
 #B_Profundo(Frontera)
-B_Voraz(Frontera)
-print("--- %s seconds ---" % (time.time() - start_time))
+
 
 
 
