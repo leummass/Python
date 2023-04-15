@@ -1,7 +1,6 @@
 import sys
 import time
-
-from busquedas_n_reinas.tableroreinas import ChessboardGUI
+from tableroreinas import ChessboardGUI
 sys.setrecursionlimit(10000000)
 
 def CalcularAtaques(lista):
@@ -24,7 +23,6 @@ def B_Ancho(Frontera):
     EA = Frontera.pop(0)
     print(EA)
     if GoalTest(EA):
-        EA.reverse()
         print(EA, " es solución")
         print("--- %s seconds ---" % (time.time() - start_time))
         gui = ChessboardGUI(len(EA), EA)
@@ -40,7 +38,6 @@ def B_Profundo(Frontera):
     EA = Frontera.pop(0)
     print(EA)
     if GoalTest(EA):
-        EA.reverse()
         print(EA, " es solución")
         print("--- %s seconds ---" % (time.time() - start_time))
         gui = ChessboardGUI(len(EA), EA)
@@ -63,24 +60,11 @@ def Expand(EA):
             V.append(listAux)
     return V
 
-def Evaluate(V):
-    listAux = []
-    V2=[]
-    for i in range(len(V)):
-        listAux= listAux + [CalcularAtaques(V[i])]
-    listAux.sort()
-    print(listAux)
-    for i in range(len(V)):
-        if CalcularAtaques(V[i]) == listAux[0]:
-            V3=V[i]
-            V2.append(V3)
-            return V2
-
 Frontera = [[0, 0, 0, 0]]
 visitados =[]
 start_time = time.time()
-B_Ancho(Frontera)
-#B_Profundo(Frontera)
+#B_Ancho(Frontera)
+B_Profundo(Frontera)
 
 
 
