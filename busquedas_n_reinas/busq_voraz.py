@@ -15,17 +15,12 @@ def CalcularAtaques(lista):
                 Ataques += 2
     return Ataques
 
-
 def GoalTest(lista):
     Numero_Ataques = CalcularAtaques(lista)
     if (Numero_Ataques == 0):
         return True
     else:
         return False
-
-
-lista_negra = []
-
 
 def Expand(V):
     copia = V.copy()
@@ -37,7 +32,6 @@ def Expand(V):
             var = V[x] + j
             if var >= reina_n:
                 V[x] = var - reina_n
-                #print(V)
                 V not in lista_negra and arregloBi.append(V.copy())
                 V = copia.copy()
                 continue
@@ -46,16 +40,14 @@ def Expand(V):
             V = copia.copy()
     return arregloBi
 
-
-def Evaluar(offSpring):
+def Evaluar(OS):
     lista = []
-    for i in offSpring:
+    for i in OS:
         Naataques = CalcularAtaques(i)
         lista.append([i, Naataques])
     return lista
 
-
-def TomaPrimerElemento(F):
+def PrimerElemento(F):
     repetidos = 0
     menor = F[0][1]
     for x in range(len(F) - 1):
@@ -65,28 +57,26 @@ def TomaPrimerElemento(F):
             break
     return F[random.randint(0, repetidos)][0]
 
-
 def voraz(F):
     if not F:
         return
-    Edo_act = F.pop(0)
+    EA = F.pop(0)
     print("ESTADO ACTUAL")
-    print(Edo_act)
-    if (GoalTest(Edo_act)):
-        print(Edo_act, " es solucion")
+    print(EA)
+    if (GoalTest(EA)):
+        print(EA, " es solución")
         print("--- %s seconds ---" % (time.time() - start_time))
-        gui = ChessboardGUI(len(Edo_act), Edo_act)
+        gui = ChessboardGUI(len(EA), EA)
         return
     else:
-        offSpring = Expand(Edo_act)
-        print(offSpring)
-        offSpring = Evaluar(offSpring)
-
-        offSpring.sort(key=lambda x: x[1])
-        F = [TomaPrimerElemento(offSpring)]
+        OS = Expand(EA)
+        print(OS)
+        OS = Evaluar(OS)
+        OS.sort(key=lambda x: x[1])
+        F = [PrimerElemento(OS)]
         voraz(F)
 
-
+lista_negra = []
 F = [[]]
 for k in range(50):
     F[0].append(0)
