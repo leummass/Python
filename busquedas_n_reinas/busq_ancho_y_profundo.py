@@ -19,13 +19,15 @@ def GoalTest(lista):
 
 def B_Ancho(Frontera):
     if not Frontera:
+        print("No hay solucion")
         return
     EA = Frontera.pop(0)
     print(EA)
+    visitados.append(EA)
     if GoalTest(EA):
         print(EA, " es solución")
         print("--- %s seconds ---" % (time.time() - start_time))
-        gui = ChessboardGUI(len(EA), EA)
+        gui = ChessboardGUI(4, visitados)
         return
     else:
         OS = Expand(EA)
@@ -34,37 +36,39 @@ def B_Ancho(Frontera):
 
 def B_Profundo(Frontera):
     if not Frontera:
+        print("No hay solucion")
         return
     EA = Frontera.pop(0)
-    print(EA)
+    visitados.append(EA)
     if GoalTest(EA):
         print(EA, " es solución")
         print("--- %s seconds ---" % (time.time() - start_time))
-        gui = ChessboardGUI(len(EA), EA)
+        gui = ChessboardGUI(4, visitados)
         return
     else:
         OS = Expand(EA)
         OS+=Frontera
-        print("Frontera",Frontera)
     B_Profundo(OS)
 
 def Expand(EA):
     V = []
-    visitados.append(EA)
     for i in range(len(EA)):
         listAux = list(EA)
         posicion = listAux[i]
         if (posicion < len(EA)-1):
             posicion += 1
             listAux[i] = posicion
-            V.append(listAux)
+            if(listAux not in visitados):
+                V.append(listAux)
+                
     return V
 
 Frontera = [[0, 0, 0, 0]]
 visitados =[]
 start_time = time.time()
-#B_Ancho(Frontera)
-B_Profundo(Frontera)
+
+B_Ancho(Frontera)
+#B_Profundo(Frontera)
 
 
 

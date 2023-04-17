@@ -59,18 +59,16 @@ def PrimerElemento(F):
 
 def voraz(F):
     if not F:
+        print("No hay solucion")
         return
     EA = F.pop(0)
-    print("ESTADO ACTUAL")
-    print(EA)
     if (GoalTest(EA)):
         print(EA, " es solución")
         print("--- %s seconds ---" % (time.time() - start_time))
-        gui = ChessboardGUI(len(EA), EA)
+        gui = ChessboardGUI(len(EA), [EA])
         return
     else:
         OS = Expand(EA)
-        print(OS)
         OS = Evaluar(OS)
         OS.sort(key=lambda x: x[1])
         F = [PrimerElemento(OS)]
