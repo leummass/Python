@@ -1,4 +1,4 @@
-from mapa import MapaRumania
+from mapa_rumania_interfaz import MapaRumania
 class Ciudad:
     def __init__(self, nombre, distanciab):
         self.nombre = nombre
@@ -87,8 +87,11 @@ def Expand(ciudad):
 
 def Evaluate(ciudades):
     for i in range(len(ciudades)):
-        ciudades[i][2]=ciudades[i][0].distanciab+ciudades[i][1]+ciudades[i][3]
+        hx=ciudades[i][0].distanciab
+        gx=ciudades[i][1]+ciudades[i][3]
+        fx=hx+gx
+        ciudades[i][2]=fx
     return ciudades
 
-F=[[fagaras,0,0,0,[]]]
+F=[[timisoara,0,0,0,[]]]
 a_estrella(F)
