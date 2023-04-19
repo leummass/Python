@@ -33,7 +33,7 @@ def Expand(EA):
                 #V.append(listAux)
                 
     return V
-
+posb_movimientos = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 ancho_tablero=10
 largo_tablero=10
 porcentaje_bloqueo=15
