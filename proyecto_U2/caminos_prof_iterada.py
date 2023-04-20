@@ -6,27 +6,32 @@ import time
 def GoalTest(EA):
     return EA==objetivo
 
-def B_Ancho(Frontera):
+def B_Profundo_Lim(Frontera,limite):
     if not Frontera:
         print("No se encontró solucion")
-        return
+        return False
     EA = Frontera.pop(0)
+    print(EA)
+    nv_act=EA[2]
     if GoalTest(EA[0]):
         print(EA[1])
+        print("Nivel de la solución: ", nv_act)
         print("--- %s seconds ---" % (time.time() - start_time))
-        return
+        return True
+    elif nv_act<limite:
+        OS = Expand(EA,nv_act)
+        Frontera = OS + Frontera
     else:
-        OS = Expand(EA)
-        Frontera += OS
-        
-    B_Ancho(Frontera)
+        print("No se encontró solución en el limite")
+        return False
+    return B_Profundo_Lim(Frontera,limite)
 
 movs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-def Expand(EA):
+def Expand(EA,nv_act):
     V = []
+    nv_act=nv_act+1
     if EA[0] not in visitados:
         aux=EA[1]+[copy.deepcopy(EA[0])]
-        print("EA 1: ", aux)
         visitados.append(EA[0])
         print("Visitados", visitados)
         for addx, addy in movs:
@@ -35,12 +40,24 @@ def Expand(EA):
             y= EA[0][1] + addy
             print("x,y: ",x, y)
             if 0 <= x < len(tablero) and 0 <= y < len(tablero[0]) and tablero[x][y] != 1 and (x,y) not in visitados:
-                V.append([(x,y),aux])
+                V.append([(x,y),aux,nv_act])
     return V
 
-ancho_tablero=10
-largo_tablero=10
-porcentaje_bloqueo=0
+def B_Profundo_It(F1):
+    limite = 2
+    sol = False
+    while(sol is not True):
+       F=copy.deepcopy(F1)
+       visitados.clear()
+       sol = B_Profundo_Lim(F, limite)
+       print(sol)
+       limite += 2
+       print("EEEEEEEEEEEEEE", limite)
+
+
+ancho_tablero=15
+largo_tablero=15
+porcentaje_bloqueo=10
 tablero = [[0]*ancho_tablero for i in range (largo_tablero)]
 bloqueos = int (ancho_tablero * largo_tablero * porcentaje_bloqueo / 100)
 bloqueados = []
@@ -53,9 +70,8 @@ for k in range(bloqueos):
     tablero[i][j] = 1
     bloqueados.append((i,j))
 print(tablero)
-print("bloqueados",bloqueados)
-objetivo = (6,6)
+print(bloqueados)
+objetivo = (14,14)
 visitados = []
 start_time = time.time()
-B_Ancho([[(0,0),[]]])
-
+B_Profundo_It([[(0,0), [], 0]])

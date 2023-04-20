@@ -7,7 +7,7 @@ WIDTH = 50
 HEIGHT = 50
 
 # Coordenadas de las casillas a dibujar en otro color
-coords = [(2, 3), (4, 5), (6, 7)]
+coords = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (1, 2), (2, 1), (3, 0), (1, 3), (2, 2), (3, 1)]
 
 # Creación de la ventana y del lienzo (canvas)
 root = tk.Tk()
