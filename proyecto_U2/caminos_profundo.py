@@ -41,16 +41,23 @@ porcentaje_bloqueo=15
 tablero = [[0]*ancho_tablero for i in range (largo_tablero)]
 bloqueos = int (ancho_tablero * largo_tablero * porcentaje_bloqueo / 100)
 bloqueados = []
+objetivo = (14,14)
+inicio=(0,0)
 for k in range(bloqueos):
     i = random.randint(0, largo_tablero-1)  
     j = random.randint(0, ancho_tablero-1)  
-    while tablero[i][j] == 1:  
-        i = random.randint(0, largo_tablero-1)
-        j = random.randint(0, ancho_tablero-1)
+    while tablero[i][j] == 1: 
+        if i==objetivo[0] and j==objetivo[1]:
+            continue
+        elif (i==inicio[0] and j==inicio[1]):
+            continue
+        else:
+            i = random.randint(0, largo_tablero-1)
+            j = random.randint(0, ancho_tablero-1)
     tablero[i][j] = 1
     bloqueados.append((i,j))
-objetivo = (14,14)
+
 visitados = []
 start_time = time.time()
 tablero_gui = Tablero(ancho_tablero,largo_tablero,15,15)
-B_Profundo([[(0,0),[]]])
+B_Profundo([[inicio,[]]])

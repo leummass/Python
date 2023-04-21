@@ -69,7 +69,9 @@ for k in range(bloqueos):
     i = random.randint(0, largo_tablero-1)  
     j = random.randint(0, ancho_tablero-1)  
     while tablero[i][j] == 1: 
-        if (i==objetivo[0] and j==objetivo[1]) or (i==inicio[0] and j==inicio[1]):
+        if i==objetivo[0] and j==objetivo[1]:
+            continue
+        elif (i==inicio[0] and j==inicio[1]):
             continue
         else:
             i = random.randint(0, largo_tablero-1)

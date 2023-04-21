@@ -3,7 +3,8 @@ import math
 import random
 import sys
 import time
-from interfazcaminos import Tablero
+import threading
+from interfaz2caminos import Tablero
 sys.setrecursionlimit(10000)
 
 def CalcularDistancia(actual):
@@ -19,22 +20,20 @@ def GoalTest(EA):
 def B_A_Estrella(Frontera):
     if not Frontera:
         print("No se encontró solucion")
-        return
+        return 
     EA = Frontera.pop(0)
-    print("EA", EA)
     if GoalTest(EA[0]):
         print("Se encontró solución")
         print(EA[1])
         print("Costo de la solución: ",EA[3])
-        tablero_gui.dibujar(bloqueados,EA[1],[objetivo])
         print("--- %s seconds ---" % (time.time() - start_time))
-        return
+        return EA[1] 
     else:
         OS = Expand(EA)
         OS = Evaluar(OS)
         OS.sort(key= lambda x: x[3])
         Frontera= Frontera+OS
-    B_A_Estrella(Frontera)
+    return B_A_Estrella(Frontera)
 
 def Evaluar(OS):
     for i in OS:
@@ -57,24 +56,23 @@ def Expand(EA):
                 V.append([(x,y),aux,EA[2]+1,0])
     return V
 
-ancho_tablero=50
-largo_tablero=50
+ancho_tablero=51
+largo_tablero=51
 porcentaje_bloqueo=10
 tablero = [[0]*ancho_tablero for i in range (largo_tablero)]
 bloqueos = int (ancho_tablero * largo_tablero * porcentaje_bloqueo / 100)
 bloqueados = []
 
 
-objetivo = (32,45)
-inicio=(0,0)
+objetivo = (25,25)
+inicio1=(0,0)
+inicio2=(44,44)
 visitados = []
 for k in range(bloqueos):
     i = random.randint(0, largo_tablero-1)  
     j = random.randint(0, ancho_tablero-1)  
     while tablero[i][j] == 1: 
-        if i==objetivo[0] and j==objetivo[1]:
-            continue
-        elif (i==inicio[0] and j==inicio[1]):
+        if (i==objetivo[0] and j==objetivo[1]) or (i==inicio1[0] and j==inicio1[1]) or (i==inicio2[0] and j==inicio2[1]):
             continue
         else:
             i = random.randint(0, largo_tablero-1)
@@ -83,4 +81,25 @@ for k in range(bloqueos):
     bloqueados.append((i,j))
 start_time = time.time()
 tablero_gui = Tablero(ancho_tablero,largo_tablero,15,15)
-B_A_Estrella([[inicio,[],0,0]])
+
+ruta_hilo_1 = []
+ruta_hilo_2 = []
+def hilo_1():
+    global ruta_hilo_1
+    ruta_hilo_1 = B_A_Estrella([[inicio1,[],0,0]])
+
+def hilo_2():
+    global ruta_hilo_2
+    ruta_hilo_2 = B_A_Estrella([[inicio2,[],0,0]])
+
+h1 = threading.Thread(target=hilo_1)
+h2 = threading.Thread(target=hilo_2)
+
+h1.start()
+h2.start()
+
+h1.join()
+h2.join()
+tablero_gui.dibujar(bloqueados,ruta_hilo_1,ruta_hilo_2,[objetivo])
+
+
