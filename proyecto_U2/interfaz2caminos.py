@@ -1,4 +1,5 @@
 import tkinter as tk
+from threading import Thread
 
 class Tablero:
     def __init__(self, N, M, WIDTH, HEIGHT):
@@ -8,6 +9,7 @@ class Tablero:
         self.HEIGHT = HEIGHT
 
     def dibujar_tablero(self, coords_bloqueadas, coords_meta):
+        # Dibujar las casillas del tablero
         for i in range(self.N):
             for j in range(self.M):
                 x0 = i*self.WIDTH
@@ -20,8 +22,8 @@ class Tablero:
                     self.canvas.create_rectangle(x0, y0, x1, y1, fill="blue")
                 else:
                     self.canvas.create_rectangle(x0, y0, x1, y1, fill="white")
-                    
-    def dibujar_caminos(self, coords_camino, color):
+
+    def dibujar_camino(self, coords_camino, color):
         for i in range(len(coords_camino)):
             x0 = coords_camino[i][0]*self.WIDTH
             y0 = coords_camino[i][1]*self.HEIGHT
@@ -29,13 +31,23 @@ class Tablero:
             y1 = y0 + self.HEIGHT
             self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
             self.root.update()
-            self.root.after(50)
 
     def dibujar(self, coords_bloqueadas, coords_camino1, coords_camino2, coords_meta):
+        # Crear la ventana y el canvas
         self.root = tk.Tk()
         self.canvas = tk.Canvas(self.root, width=self.N*self.WIDTH, height=self.M*self.HEIGHT)
         self.canvas.pack()
+
+        # Dibujar el tablero con las coordenadas bloqueadas
         self.dibujar_tablero(coords_bloqueadas, coords_meta)
-        self.dibujar_caminos(coords_camino1, "green")
-        self.dibujar_caminos(coords_camino2, "orange")
+
+        # Dibujar el primer camino en un hilo
+        t1 = Thread(target=self.dibujar_camino, args=(coords_camino1, "green"))
+        t1.start()
+
+        # Dibujar el segundo camino en otro hilo
+        t2 = Thread(target=self.dibujar_camino, args=(coords_camino2, "yellow"))
+        t2.start()
+
+        # Iniciar el bucle
         self.root.mainloop()
