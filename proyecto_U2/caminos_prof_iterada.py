@@ -1,7 +1,7 @@
 import copy
 import random
 import time
-
+from interfazcaminos import Tablero
 
 def GoalTest(EA):
     return EA==objetivo
@@ -9,6 +9,7 @@ def GoalTest(EA):
 def B_Profundo_Lim(Frontera,limite):
     if not Frontera:
         print("No se encontró solucion")
+        tablero_gui.dibujar(bloqueados,visitados,[objetivo])
         return False
     EA = Frontera.pop(0)
     print(EA)
@@ -17,6 +18,7 @@ def B_Profundo_Lim(Frontera,limite):
         print(EA[1])
         print("Nivel de la solución: ", nv_act)
         print("--- %s seconds ---" % (time.time() - start_time))
+        tablero_gui.dibujar(bloqueados,visitados,[objetivo])
         return True
     elif nv_act<limite:
         OS = Expand(EA,nv_act)
@@ -61,17 +63,21 @@ porcentaje_bloqueo=10
 tablero = [[0]*ancho_tablero for i in range (largo_tablero)]
 bloqueos = int (ancho_tablero * largo_tablero * porcentaje_bloqueo / 100)
 bloqueados = []
+objetivo = (10,10)
+inicio=(0,0)
 for k in range(bloqueos):
     i = random.randint(0, largo_tablero-1)  
     j = random.randint(0, ancho_tablero-1)  
-    while tablero[i][j] == 1:  
-        i = random.randint(0, largo_tablero-1)
-        j = random.randint(0, ancho_tablero-1)
+    while tablero[i][j] == 1: 
+        if (i==objetivo[0] and j==objetivo[1]) or (i==inicio[0] and j==inicio[1]):
+            continue
+        else:
+            i = random.randint(0, largo_tablero-1)
+            j = random.randint(0, ancho_tablero-1)
     tablero[i][j] = 1
     bloqueados.append((i,j))
-print(tablero)
-print(bloqueados)
-objetivo = (14,14)
+
 visitados = []
 start_time = time.time()
-B_Profundo_It([[(0,0), [], 0]])
+tablero_gui = Tablero(ancho_tablero,largo_tablero,15,15)
+B_Profundo_It([[inicio, [], 0]])

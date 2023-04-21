@@ -2,6 +2,7 @@ import copy
 import math
 import random
 import time
+from interfazcaminos import Tablero
 
 def CalcularDistancia(actual):
     x1=actual[0]
@@ -16,21 +17,19 @@ def GoalTest(EA):
 def B_Voraz(Frontera):
     if not Frontera:
         print("No se encontró solucion")
+        tablero_gui.dibujar(bloqueados,visitados,[objetivo])
         return
     EA = Frontera.pop(0)
-    print("EA", EA)
     if GoalTest(EA[0]):
-        print(EA[1])
+        visitados.append(EA[0])
+        print(visitados)
         print("--- %s seconds ---" % (time.time() - start_time))
+        tablero_gui.dibujar(bloqueados,visitados,[objetivo])
         return
     else:
         OS = Expand(EA)
-        print("EA a expandir", EA)
-        print("OS despues de expandir EA", OS)
         OS = Evaluar(OS)
-        print("OS despues de EVALUAR", OS)
         OS.sort(key= lambda x: x[2])
-        print("OS despues de SORTIN ", OS)
         Frontera= PrimerElemento(OS)
     B_Voraz(Frontera)
 
@@ -42,9 +41,10 @@ def Evaluar(OS):
 
 def PrimerElemento(F):
     repetidos = 0
+    if not F:
+        return
     menor = F[0][2]
-    
-    for x in range(len(F) - 1):
+    for x in range(len(F)-1):
         if (menor == F[x + 1][2]):
             repetidos = repetidos + 1
         else:
@@ -61,7 +61,7 @@ def Expand(EA):
             x= EA[0][0] + addx 
             y= EA[0][1] + addy
             if 0 <= x < len(tablero) and 0 <= y < len(tablero[0]) and tablero[x][y] != 1 and (x,y) not in visitados:
-                V.append([(x,y),aux])
+                V.append([(x,y),aux])           
     return V
 
 ancho_tablero=50
@@ -70,9 +70,7 @@ porcentaje_bloqueo=10
 tablero = [[0]*ancho_tablero for i in range (largo_tablero)]
 bloqueos = int (ancho_tablero * largo_tablero * porcentaje_bloqueo / 100)
 bloqueados = []
-
-
-objetivo = (14,14)
+objetivo = (35,40)
 inicio=(0,0)
 visitados = []
 for k in range(bloqueos):
@@ -86,8 +84,6 @@ for k in range(bloqueos):
             j = random.randint(0, ancho_tablero-1)
     tablero[i][j] = 1
     bloqueados.append((i,j))
-print(tablero)
-print(bloqueados)
 start_time = time.time()
+tablero_gui = Tablero(ancho_tablero,largo_tablero,15,15)
 B_Voraz([[inicio,[]]])
-print("visired: ", visitados)

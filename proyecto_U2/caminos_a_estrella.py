@@ -1,7 +1,10 @@
 import copy
 import math
 import random
+import sys
 import time
+from interfazcaminos import Tablero
+sys.setrecursionlimit(10000)
 
 def CalcularDistancia(actual):
     x1=actual[0]
@@ -13,43 +16,33 @@ def CalcularDistancia(actual):
 def GoalTest(EA):
     return EA==objetivo
 
-def B_Voraz(Frontera):
+def B_A_Estrella(Frontera):
     if not Frontera:
         print("No se encontró solucion")
         return
     EA = Frontera.pop(0)
     print("EA", EA)
     if GoalTest(EA[0]):
+        print("Se encontró solución")
         print(EA[1])
+        print("Costo de la solución: ",EA[3])
+        tablero_gui.dibujar(bloqueados,EA[1],[objetivo])
         print("--- %s seconds ---" % (time.time() - start_time))
         return
     else:
         OS = Expand(EA)
-        print("EA a expandir", EA)
-        print("OS despues de expandir EA", OS)
         OS = Evaluar(OS)
-        print("OS despues de EVALUAR", OS)
-        OS.sort(key= lambda x: x[2])
-        print("OS despues de SORTIN ", OS)
-        Frontera= PrimerElemento(OS)
-    B_Voraz(Frontera)
+        OS.sort(key= lambda x: x[3])
+        Frontera= Frontera+OS
+    B_A_Estrella(Frontera)
 
 def Evaluar(OS):
     for i in OS:
-        distancia=CalcularDistancia(i[0])
-        i.append(distancia)
+        hx=CalcularDistancia(i[0])
+        gx=i[2]
+        fx=hx+gx
+        i[3]=fx
     return OS
-
-def PrimerElemento(F):
-    repetidos = 0
-    menor = F[0][2]
-    
-    for x in range(len(F) - 1):
-        if (menor == F[x + 1][2]):
-            repetidos = repetidos + 1
-        else:
-            break
-    return [F[random.randint(0, repetidos)]]
 
 movs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 def Expand(EA):
@@ -61,7 +54,7 @@ def Expand(EA):
             x= EA[0][0] + addx 
             y= EA[0][1] + addy
             if 0 <= x < len(tablero) and 0 <= y < len(tablero[0]) and tablero[x][y] != 1 and (x,y) not in visitados:
-                V.append([(x,y),aux])
+                V.append([(x,y),aux,EA[2]+1,0])
     return V
 
 ancho_tablero=50
@@ -72,7 +65,7 @@ bloqueos = int (ancho_tablero * largo_tablero * porcentaje_bloqueo / 100)
 bloqueados = []
 
 
-objetivo = (14,14)
+objetivo = (32,45)
 inicio=(0,0)
 visitados = []
 for k in range(bloqueos):
@@ -86,8 +79,6 @@ for k in range(bloqueos):
             j = random.randint(0, ancho_tablero-1)
     tablero[i][j] = 1
     bloqueados.append((i,j))
-print(tablero)
-print(bloqueados)
 start_time = time.time()
-B_Voraz([[inicio,[]]])
-print("visired: ", visitados)
+tablero_gui = Tablero(ancho_tablero,largo_tablero,15,15)
+B_A_Estrella([[inicio,[],0,0]])
